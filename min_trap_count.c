@@ -25,19 +25,20 @@ double Trap(double left, double right, int trap_count, double base) {
   return estimate;
 }
 //2001875
-//
+//964104
 int min_trap_count(double left, double right) {
-  int count = 951750, min_count;
+  int count = 964100, min_count;
   double estimate, min = 1000000000000;
 
   while(count > 0) {
   	estimate = Trap(left, right, count, (right-left)/count);
-    if(estimate < min) {
+    printf("%d:  %.14f \n", count, estimate);
+    /*if(estimate < min) {
       min = estimate;
       min_count = count;
       printf("Min: %.14f\n", (min - true_val)/true_val);
       //printf("%d:  %.14f \n", count, (estimate - true_val)/true_val);
-    }
+    }*/
   	if((estimate - true_val)/true_val < target) {
       printf("Estimate:  %.14e\n", estimate);
       printf("Error: %e\nCriteria: %e \n", (estimate - true_val)/true_val, target);

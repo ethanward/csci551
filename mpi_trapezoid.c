@@ -52,6 +52,8 @@ void Get_input(int my_rank, int comm_sz, double* a_p, double* b_p, int* n_p) {
 
 int main(void) {
   int my_rank, comm_sz, n, local_n, src; 
+  double true_val = 4003.7209001513268265;
+  double target = .5 * pow(10, -12);
   double local_start, local_finish, local_elapsed, elapsed;
   double a, // The user input for a 
     local_total,
@@ -72,7 +74,7 @@ int main(void) {
 
   local_a = a + my_rank*local_n*h;
   local_b = local_a + local_n*h;
-  
+
   MPI_Barrier(MPI_COMM_WORLD);
   if(my_rank == 0)
     local_start = MPI_Wtime();
@@ -99,11 +101,11 @@ int main(void) {
 
   if(my_rank == 0) {
     printf("Running on %d processors.\n", comm_sz);
+    printf("Elapsed time = %e seconds\n", elapsed);
     printf("With n = %d trapezoids, our estimate\n", n);
     printf("of the integral from %f to %f = %.13e\n", a, b, total);
-    printf("Elapsed time = %e seconds\n", elapsed);
-
-    printf("\n%.10f\n", h);
+    printf("absolute relative true error = %e is NOT less than criteria %e \n", (total - true_val)/true_val, target);
+    //printf("\n%.10f\n", h);
   }
 
   MPI_Finalize();
