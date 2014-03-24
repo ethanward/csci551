@@ -72,10 +72,19 @@ int main(void) {
 
   local_a = a + my_rank*local_n*h;
   local_b = local_a + local_n*h;
+  
   MPI_Barrier(MPI_COMM_WORLD);
-  local_start = MPI_Wtime();
+  if(my_rank == 0)
+    local_start = MPI_Wtime();
 
   local_total = Trap(local_a, local_b, local_n, h);
+
+  if(my_rank == 0) {
+    local_finish = MPI_Wtime();
+    local_elapsed = local_finish - local_start;
+  }
+
+  MPI_Reduce(&local_elapsed, &elapsed, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
   if(my_rank != 0) {
     MPI_Send(&local_total, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
@@ -88,17 +97,13 @@ int main(void) {
     }
   }
 
-  local_finish = MPI_Wtime();
-  local_elapsed = local_finish - local_start;
-  MPI_Reduce(&local_elapsed, &elapsed, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-
   if(my_rank == 0) {
-      printf("Running on %d processors.\n", comm_sz);
-      printf("With n = %d trapezoids, our estimate\n", n);
-      printf("of the integral from %f to %f = %.13e\n", a, b, total);
-      printf("Elapsed time = %e seconds\n", elapsed);
+    printf("Running on %d processors.\n", comm_sz);
+    printf("With n = %d trapezoids, our estimate\n", n);
+    printf("of the integral from %f to %f = %.13e\n", a, b, total);
+    printf("Elapsed time = %e seconds\n", elapsed);
 
-      printf("\n%.10f\n", h);
+    printf("\n%.10f\n", h);
   }
 
   MPI_Finalize();
